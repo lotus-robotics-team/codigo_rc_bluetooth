@@ -45,6 +45,7 @@ class DRV887X {
                 .count_mode = MCPWM_TIMER_COUNT_MODE_UP,  // Contagem crescente
                 .period_ticks = PERIOD_TICKS,             // Frequência do PWM = RESOLUCAO_HZ / PERIOD_TICKS (PERIOD_TICKS é o número de ticks para completar um período do PWM)
                 .intr_priority = 0,                       // Sem prioridade de interrupção
+                .flags = {}
             };
             mcpwm_new_timer(&configTimer, &timer);
             mcpwm_timer_enable(timer);
@@ -52,9 +53,9 @@ class DRV887X {
         }
 
         void initOperators() {
-            mcpwm_operator_config_t configOperator = {
-                .group_id = 0,
-            };
+            mcpwm_operator_config_t configOperator = {};
+            configOperator.group_id = 0;
+
             mcpwm_new_operator(&configOperator, &oper);
             mcpwm_operator_connect_timer(oper, timer);
         }
@@ -65,6 +66,8 @@ class DRV887X {
                 /// @attention O update compare on timer equal zero é essencial para evitar o driver queimar com pulsos errados
                 .flags = {
                     .update_cmp_on_tez = true, // Atualiza o valor do comparador no início do período
+                    .update_cmp_on_tep = false,
+                    .update_cmp_on_sync = false
                 }
             };
             mcpwm_new_comparator(oper, &configComparator, &cmprIN1);
@@ -73,12 +76,14 @@ class DRV887X {
 
         void initGenerators() {
             mcpwm_generator_config_t configGeneratorIN1 = {
-                .gen_gpio_num = pinoIN1
+                .gen_gpio_num = pinoIN1,
+                .flags = {}
             };
             mcpwm_new_generator(oper, &configGeneratorIN1, &genIN1);
 
             mcpwm_generator_config_t configGeneratorIN2 = {
-                .gen_gpio_num = pinoIN2
+                .gen_gpio_num = pinoIN2,
+                .flags = {}
             };
             mcpwm_new_generator(oper, &configGeneratorIN2, &genIN2);
 
@@ -124,7 +129,7 @@ class DRV887X {
             }
         }
 
-        void begin() {
+        inline void begin() {
             initTimer();
             initOperators();
             initComparators();
