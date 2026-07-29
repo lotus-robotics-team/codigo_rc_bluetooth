@@ -1,23 +1,27 @@
-#include <Arduino.h>
-#include <ps5Controller.h>
+// Arquivo principal do projeto
 
-const char *ENDERECO_BLUETOOTH = "4c:b9:9b:1c:44:d8";
+#include <stdio.h>
+
+#include "locomocao.hpp"
+#include "eletronica/config.hpp"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "esp_system.h"
+#include "esp_log.h"
+#include "esp_check.h"
+#include "nvs_flash.h"
+
+extern "C" void app_main(void) {
+   Sistema::initFlashNVS(); // Inicializa a memória flash não volátil
 
 
-void setup() {
+   motorDireito.begin();   // Inicializa o MCPWM do motor direito
+   motorEsquerdo.begin();  // Inicializa o MCPWM do motor esquerdo
 
-  ps5.begin(ENDERECO_BLUETOOTH);
-  
-}
+   while (true) {
 
-void loop() {
-
-  if (ps5.isConnected()) {
-    // Loop do robô
-  }
-
-  else {
-    // Robô parado
-  }
-
+      vTaskDelay(pdMS_TO_TICKS(10));
+   }
 }
