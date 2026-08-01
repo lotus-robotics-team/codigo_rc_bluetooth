@@ -1,7 +1,9 @@
 # Pastas de configurações de ambiente do platformio e vscode
 .pio/
 .vscode/
+build/
 
 # Arquivo de configuração do esp-idf (exceção para o default)
+sdkconfig
 sdkconfig.*
 !sdkconfig.defaults
