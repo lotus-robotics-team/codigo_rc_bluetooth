@@ -9,6 +9,8 @@
 #include "driver/mcpwm_oper.h"
 #include "driver/mcpwm_cmpr.h"
 #include "driver/mcpwm_gen.h"
+#include "esp_err.h"
+#include "esp_check.h"
 
 class HBridgePWM {
     private:
@@ -30,10 +32,10 @@ class HBridgePWM {
 
         static constexpr std::uint32_t RESOLUCAO_HZ = 25'000'000;
         static constexpr std::uint32_t PERIOD_TICKS = 1000;
-        static constexpr std::uint32_t FREQUENCIA = RESOLUCAO_HZ / PERIOD_TICKS; // 25MHz
+        static constexpr std::uint32_t FREQUENCIA   = RESOLUCAO_HZ / PERIOD_TICKS; // 25MHz
 
         static constexpr std::uint32_t VALOR_MAX_POTENCIA = PERIOD_TICKS;
-        static constexpr std::int32_t VALOR_MIN_POTENCIA = -VALOR_MAX_POTENCIA;
+        static constexpr std::int32_t VALOR_MIN_POTENCIA  = -VALOR_MAX_POTENCIA;
 
         std::int32_t potencia = 0;
 
@@ -47,17 +49,17 @@ class HBridgePWM {
                 .intr_priority = 0,                       // Sem prioridade de interrupção
                 .flags = {}
             };
-            mcpwm_new_timer(&configTimer, &timer);
-            mcpwm_timer_enable(timer);
-            mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP);
+            ESP_ERROR_CHECK(mcpwm_new_timer(&configTimer, &timer));
+            ESP_ERROR_CHECK(mcpwm_timer_enable(timer));
+            ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP));
         }
 
         void initOperators() {
             mcpwm_operator_config_t configOperator = {};
             configOperator.group_id = 0;
 
-            mcpwm_new_operator(&configOperator, &oper);
-            mcpwm_operator_connect_timer(oper, timer);
+            ESP_ERROR_CHECK(mcpwm_new_operator(&configOperator, &oper));
+            ESP_ERROR_CHECK(mcpwm_operator_connect_timer(oper, timer));
         }
 
         void initComparators() {
@@ -70,8 +72,8 @@ class HBridgePWM {
                     .update_cmp_on_sync = false
                 }
             };
-            mcpwm_new_comparator(oper, &configComparator, &cmprIN1);
-            mcpwm_new_comparator(oper, &configComparator, &cmprIN2);
+            ESP_ERROR_CHECK(mcpwm_new_comparator(oper, &configComparator, &cmprIN1));
+            ESP_ERROR_CHECK(mcpwm_new_comparator(oper, &configComparator, &cmprIN2));
         }
 
         void initGenerators() {
@@ -79,43 +81,45 @@ class HBridgePWM {
                 .gen_gpio_num = pinoIN1,
                 .flags = {}
             };
-            mcpwm_new_generator(oper, &configGeneratorIN1, &genIN1);
+            ESP_ERROR_CHECK(mcpwm_new_generator(oper, &configGeneratorIN1, &genIN1));
 
             mcpwm_generator_config_t configGeneratorIN2 = {
                 .gen_gpio_num = pinoIN2,
                 .flags = {}
             };
-            mcpwm_new_generator(oper, &configGeneratorIN2, &genIN2);
+            ESP_ERROR_CHECK(mcpwm_new_generator(oper, &configGeneratorIN2, &genIN2));
 
             mcpwm_gen_timer_event_action_t actionZero = {
                 .direction = MCPWM_TIMER_DIRECTION_UP,
                 .event = MCPWM_TIMER_EVENT_EMPTY,
                 .action = MCPWM_GEN_ACTION_HIGH
             };
-            mcpwm_generator_set_action_on_timer_event(genIN1, actionZero);
-            mcpwm_generator_set_action_on_timer_event(genIN2, actionZero);
+            ESP_ERROR_CHECK(mcpwm_generator_set_action_on_timer_event(genIN1, actionZero));
+            ESP_ERROR_CHECK(mcpwm_generator_set_action_on_timer_event(genIN2, actionZero));
 
             mcpwm_gen_compare_event_action_t actionIN1Compare = {
                 .direction = MCPWM_TIMER_DIRECTION_UP,
                 .comparator = cmprIN1,
                 .action = MCPWM_GEN_ACTION_LOW
             };
-            mcpwm_generator_set_action_on_compare_event(genIN1, actionIN1Compare);
+            ESP_ERROR_CHECK(mcpwm_generator_set_action_on_compare_event(genIN1, actionIN1Compare));
 
             mcpwm_gen_compare_event_action_t actionIN2Compare = {
                 .direction = MCPWM_TIMER_DIRECTION_UP,
                 .comparator = cmprIN2,
                 .action = MCPWM_GEN_ACTION_LOW
             };
-            mcpwm_generator_set_action_on_compare_event(genIN2, actionIN2Compare);
+            ESP_ERROR_CHECK(mcpwm_generator_set_action_on_compare_event(genIN2, actionIN2Compare));
         }
 
     public:
-        HBridgePWM(std::uint8_t pIN1, std::uint8_t pIN2) 
-            : pinoIN1(static_cast<int>(pIN1)), pinoIN2(static_cast<int>(pIN2)) {} // Construtor
+        HBridgePWM(int pIN1, int pIN2) 
+            : pinoIN1(pIN1), pinoIN2(pIN2) {} // Construtor
 
         HBridgePWM(const HBridgePWM&) = delete; // Desabilita o construtor de cópia
+        HBridgePWM(HBridgePWM&&)      = delete; // Desabilita o construtor de movimentação
         HBridgePWM& operator=(const HBridgePWM&) = delete; // Desabilita o operador de atribuição de cópia
+        HBridgePWM& operator=(HBridgePWM&&)      = delete; // Desabilita o operador de atribuição de movimentação
 
         ~HBridgePWM() {
             if (genIN1)  mcpwm_del_generator(genIN1);
@@ -140,6 +144,8 @@ class HBridgePWM {
 
         inline void setPotencia(std::int32_t p) {
             p = std::clamp<std::int32_t>(p, VALOR_MIN_POTENCIA, VALOR_MAX_POTENCIA);
+
+            if (invertido) p = -p;
 
             if (p > 0) {
                 mcpwm_comparator_set_compare_value(cmprIN1, VALOR_MAX_POTENCIA - p);
@@ -168,15 +174,15 @@ class HBridgePWM {
             mcpwm_comparator_set_compare_value(cmprIN2, 0);
         }
 
-        inline std::int32_t getPotencia() const {
+        [[nodiscard]] inline std::int32_t getPotencia() const {
             return potencia;
         }
 
-        inline std::int32_t getValorMaximoPotencia() const {
+        [[nodiscard]] inline std::int32_t getValorMaximoPotencia() const {
             return VALOR_MAX_POTENCIA;
         }
 
-        inline std::int32_t getValorMinimoPotencia() const {
+        [[nodiscard]] inline std::int32_t getValorMinimoPotencia() const {
             return VALOR_MIN_POTENCIA;
         }
 };
