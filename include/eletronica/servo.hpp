@@ -4,6 +4,8 @@ Classe responsável pelo controle do servo motor
 
 #pragma once
 
+#include <cstdint>
+
 #include "driver/ledc.h"
 #include "esp_log.h"
 #include "hal/gpio_types.h"
@@ -15,13 +17,13 @@ class Servo {
         ledc_channel_t canal;
 
         // Atributo que armazena o valor da posição atual do servo motor
-        uint8_t posicao = 0;
+        std::uint8_t posicao = 0;
 
         // Definição do valor da frequência do sinal PWM do servo motor
-        static constexpr uint32_t FREQUENCIA_DO_SINAL_PWM_DO_SERVO_MOTOR = 50;
+        static constexpr std::uint32_t FREQUENCIA_DO_SINAL_PWM_DO_SERVO_MOTOR = 50;
 
         // Definição da resolução do sinal PWM
-        static constexpr uint8_t RESOLUCAO_DO_SINAL_PWM_DO_SERVO_MOTOR = 15;
+        static constexpr std::uint8_t RESOLUCAO_DO_SINAL_PWM_DO_SERVO_MOTOR = 15;
 
         // Definição das porcentagens do ciclo de trabalho do sinal PWM
         // Período do sinal PWM: 20000us
@@ -89,13 +91,13 @@ class Servo {
          * 
          * @param posicao Valor da posição, na qual varia no intervalo [0, 180], para aplicar no servo motor.
          */
-        void setPosicao(uint8_t pos) {
+        void setPosicao(std::uint8_t pos) {
             // Atualiza o atributo da posição do servo motor com o valor da posição atual e limita o valor da posição no intervalo [0, 180]
             this->posicao = (pos > 180) ? 180 : pos;
 
             // Remapeia o valor da posição do servo motor para o intervalo do ciclo de trabalho do sinal PWM
-            uint32_t diferencaPWM = VALOR_MAXIMO_DO_CICLO_DE_TRABALHO_DO_SERVO_MOTOR - VALOR_MINIMO_DO_CICLO_DE_TRABALHO_DO_SERVO_MOTOR;
-            uint32_t posicaoRemapeada = VALOR_MINIMO_DO_CICLO_DE_TRABALHO_DO_SERVO_MOTOR + ((this->posicao * diferencaPWM) / 180);
+            std::uint32_t diferencaPWM = VALOR_MAXIMO_DO_CICLO_DE_TRABALHO_DO_SERVO_MOTOR - VALOR_MINIMO_DO_CICLO_DE_TRABALHO_DO_SERVO_MOTOR;
+            std::uint32_t posicaoRemapeada = VALOR_MINIMO_DO_CICLO_DE_TRABALHO_DO_SERVO_MOTOR + ((this->posicao * diferencaPWM) / 180);
 
             // Escreve no canal o valor remapeado
             ledc_set_duty(LEDC_HIGH_SPEED_MODE, this->canal, posicaoRemapeada);
@@ -107,7 +109,7 @@ class Servo {
          * 
          * @return O valor da posição atual do servo motor.
          */
-        uint8_t getPosicao() const { 
+        std::uint8_t getPosicao() const { 
             return this->posicao; 
         }
 };
