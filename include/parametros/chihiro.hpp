@@ -4,20 +4,20 @@
 
 #include <cstdint>
 
-float velocidadePadrao = 0.5f;
-float velocidadeAgressiva = 0.7f;
+constexpr float velocidadePadrao = 0.5f;
+constexpr float velocidadeAgressiva = 0.7f;
 
 /* MACROS */
-int tempoFreioDeMao = 60;
+constexpr int tempoFreioDeMao = 60;
 
-int tempoGiro45Horario      = 50;
-int tempoGiro45AntiHorario  = 50;
-int tempoGiro90Horario      = 100;
-int tempoGiro90AntiHorario  = 100;
-int tempoGiro180Horario     = 200;
-int tempoGiro180AntiHorario = 200;
+constexpr int tempoGiro45Horario      = 50;
+constexpr int tempoGiro45AntiHorario  = 50;
+constexpr int tempoGiro90Horario      = 100;
+constexpr int tempoGiro90AntiHorario  = 100;
+constexpr int tempoGiro180Horario     = 200;
+constexpr int tempoGiro180AntiHorario = 200;
 
-int tempoFrenteZigZagHorario     = 100;
-int tempoFrenteZigZagAntiHorario = 100;
+constexpr int tempoFrenteZigZagHorario     = 100;
+constexpr int tempoFrenteZigZagAntiHorario = 100;
 
 #endif

@@ -5,6 +5,7 @@
 
 #include "eletronica/config.hpp"
 #include "parametros/chihiro.hpp"
+#include "parametros/hockey.hpp"
 #include "controle.hpp"
 
 #include <esp_timer.h>
