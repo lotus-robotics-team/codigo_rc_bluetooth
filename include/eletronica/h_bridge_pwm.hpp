@@ -10,7 +10,6 @@
 #include "driver/mcpwm_cmpr.h"
 #include "driver/mcpwm_gen.h"
 #include "esp_err.h"
-#include "esp_check.h"
 
 class HBridgePWM {
     private:
@@ -175,14 +174,14 @@ class HBridgePWM {
         }
 
         [[nodiscard]] inline std::int32_t getPotencia() const {
-            return potencia;
+            return this->potencia;
         }
 
-        [[nodiscard]] inline std::int32_t getValorMaximoPotencia() const {
+        [[nodiscard]] inline static std::int32_t getValorMaximoPotencia() {
             return VALOR_MAX_POTENCIA;
         }
 
-        [[nodiscard]] inline std::int32_t getValorMinimoPotencia() const {
+        [[nodiscard]] inline static std::int32_t getValorMinimoPotencia() {
             return VALOR_MIN_POTENCIA;
         }
 };
