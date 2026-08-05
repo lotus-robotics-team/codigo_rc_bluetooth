@@ -49,7 +49,7 @@ class Bluetooth {
         static uni_error_t callbackOnDeviceReady(uni_hid_device_t* device) {
             if (device == nullptr) return UNI_ERROR_INVALID_DEVICE;
 
-            uni_bt_enable_new_connections_unsafe(false); // Desabilita novas conexões
+            uni_bt_enable_new_connections_safe(false); // Desabilita novas conexões
 
             Controle::mudarCorControle(device, 0, 255, 0); // Muda a cor do controle para verde
             led.ligar();                         // Liga o LED da placa
@@ -59,12 +59,6 @@ class Bluetooth {
         }
 
         static uni_error_t callbackOnDeviceDiscovered(bd_addr_t addr, const char* nome, uint16_t cod, uint8_t rssi) {
-            // const uint8_t ENDERECO_MAC[6] = {0x4c, 0xb9, 0x9b, 0x1c, 0x44, 0xd8};
-
-            // if (memcmp(addr, ENDERECO_MAC, 6) == 0) {
-            //     return UNI_ERROR_SUCCESS;
-            // }
-
             return UNI_ERROR_SUCCESS;
         }
 
@@ -84,6 +78,7 @@ class Bluetooth {
             .on_controller_data = callbackOnGamepadData,
             .get_property = callbackGetProperty,
             .on_oob_event = callbackOnOobEvent,
+            .register_console_cmds = nullptr
         };
 
     public:

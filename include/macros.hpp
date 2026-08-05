@@ -12,15 +12,12 @@
 
 class Macros {
     private:
-        HBridgePWM &motorEsquerdo;
-        HBridgePWM &motorDireito;
-
-        bool delay(int tempo) {
+        static bool delay(int tempo) {
             tempo *= 1000;
             unsigned long tempoAtual = esp_timer_get_time();
 
             while (esp_timer_get_time() - tempoAtual <= tempo) {
-                if ((std::abs(estados.velocidadeLinear) > 0) || (std::abs(estados.velocidadeAngular) > 0)) {
+                if ((std::abs(Controle::getVelocidadeLinear()) > 0) || (std::abs(Controle::getVelocidadeAngular()) > 0)) {
                     return true; // Interrompe o delay se houver entrada do controle
                 }
             }
@@ -28,16 +25,16 @@ class Macros {
             return false; // Delay concluído sem interrupção
         }
 
-        void freioDeMao() {
+        static void freioDeMao() {
             motorEsquerdo.freiar();
             motorDireito.freiar();
 
-            if (delay(tempoFreioDeMao)) {
+            if (delay(Parametros::tempoFreioDeMao)) {
                 return;
             }
         }
 
-        void giro(bool sentidoHorario, int tempo) {
+        static void giro(bool sentidoHorario, int tempo) {
             if (sentidoHorario) {
                 motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
                 motorDireito.setPotencia(-motorDireito.getValorMinimoPotencia());
@@ -56,49 +53,53 @@ class Macros {
         }
 
     public:
+        static void fullFrente(int32_t velocidade) {
+            velocidade = std::clamp(velocidade, static_cast<int32_t>(0), HBridgePWM::getValorMaximoPotencia());
 
-        Macros(HBridgePWM &motorEsquerdo, HBridgePWM &motorDireito) : motorEsquerdo(motorEsquerdo), motorDireito(motorDireito) {}
+            motorEsquerdo.setPotencia(velocidade);
+            motorDireito.setPotencia(velocidade);
+        }
 
-        void zigZagHorario() {
-            giro(false, tempoGiro45AntiHorario);
+        static void zigZagHorario() {
+            giro(false, Parametros::tempoGiro45AntiHorario);
 
             motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
             motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
 
-            if (delay(tempoFrenteZigZagHorario)) {
+            if (delay(Parametros::tempoFrenteZigZagHorario)) {
                 return;
             }
 
             freioDeMao();
 
-            giro(true, tempoGiro90Horario);
+            giro(true, Parametros::tempoGiro90Horario);
 
             motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
             motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
 
-            if (delay(tempoFrenteZigZagHorario)) {
+            if (delay(Parametros::tempoFrenteZigZagHorario)) {
                 return;
             }
         }
 
-        void zigZagAntiHorario() {
-            giro(true, tempoGiro45Horario);
+        static void zigZagAntiHorario() {
+            giro(true, Parametros::tempoGiro45Horario);
 
             motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
             motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
 
-            if (delay(tempoFrenteZigZagAntiHorario)) {
+            if (delay(Parametros::tempoFrenteZigZagAntiHorario)) {
                 return;
             }
 
             freioDeMao();
 
-            giro(false, tempoGiro90AntiHorario);
+            giro(false, Parametros::tempoGiro90AntiHorario);
 
             motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
             motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
 
-            if (delay(tempoFrenteZigZagAntiHorario)) {
+            if (delay(Parametros::tempoFrenteZigZagAntiHorario)) {
                 return;
             }
         }

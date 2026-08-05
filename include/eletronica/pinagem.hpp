@@ -26,6 +26,8 @@ namespace Pino {
         constexpr int MOTOR_DIREITO_D2  = 16;
         constexpr int MOTOR_DIREITO_D3  = 17;
 
+        constexpr gpio_num_t LED = GPIO_NUM_23;
+
     #endif
 }
 
