@@ -82,7 +82,7 @@ class Controle {
             // bool quadradoApertado = (gamepad->buttons & Botao::QUADRADO) != 0;
             bool trianguloApertado = (gamepad->buttons & Botao::TRIANGULO) != 0;
 
-            bool cimaApertado = (gamepad->buttons & Botao::CIMA) != 0;
+            // bool cimaApertado = (gamepad->buttons & Botao::CIMA) != 0;
             // bool baixoApertado = (gamepad->buttons & Botao::BAIXO) != 0;
             bool direitaApertado = (gamepad->buttons & Botao::DIREITA) != 0;
             bool esquerdaApertado = (gamepad->buttons & Botao::ESQUERDA) != 0;

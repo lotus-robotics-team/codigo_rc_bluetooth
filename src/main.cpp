@@ -38,6 +38,8 @@ extern "C" void app_main(void) {
    // Variáveis para debouncings
    bool estadoArmadoAnterior = false;
    bool modoAgressivoAnterior = false;
+   bool inverterMotorDireitoAnterior = false;
+   bool inverterMotorEsquerdoAnterior = false;
 
    while (true) {
       Estados comando = Controle::getEstados();
@@ -85,6 +87,14 @@ extern "C" void app_main(void) {
             pararRobo();
          }
 
+         if (comando.inverterMotorDireito && !inverterMotorDireitoAnterior) {
+            motorDireito.setInversao(!motorDireito.invertido);
+         }
+
+         if (comando.inverterMotorEsquerdo && !inverterMotorEsquerdoAnterior) {
+            motorEsquerdo.setInversao(!motorEsquerdo.invertido);
+         }
+
          if (comando.modoAgressivo && !modoAgressivoAnterior) {
             if (Parametros::percentualVelocidade == Parametros::velocidadePadrao) {
                Parametros::percentualVelocidade = Parametros::velocidadeAgressiva;
@@ -98,6 +108,8 @@ extern "C" void app_main(void) {
          }
 
          modoAgressivoAnterior = comando.modoAgressivo;
+         inverterMotorDireitoAnterior = comando.inverterMotorDireito;
+         inverterMotorEsquerdoAnterior = comando.inverterMotorEsquerdo;
       }
 
       else {
