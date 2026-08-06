@@ -18,27 +18,12 @@ void mixagem(std::int32_t &velocidadeLinear, std::int32_t &velocidadeAngular, fl
     std::int32_t velocidadeMotorEsquerdo = velocidadeLinear + velocidadeAngular;
     std::int32_t velocidadeMotorDireito  = velocidadeLinear - velocidadeAngular;
 
-    /* Mixagem proporcional */
-    std::int32_t diferencaVelocidade = std::abs(std::abs(velocidadeAngular) - std::abs(velocidadeLinear));
+    std::int32_t max_val = std::max(std::abs(velocidadeMotorEsquerdo), std::abs(velocidadeMotorDireito));
 
-    if (velocidadeMotorEsquerdo < 0) {
-        velocidadeMotorEsquerdo -= diferencaVelocidade;
+    if (max_val > HBridgePWM::getValorMaximoPotencia()) {
+        velocidadeMotorEsquerdo = (velocidadeMotorEsquerdo * HBridgePWM::getValorMaximoPotencia()) / max_val;
+        velocidadeMotorDireito  = (velocidadeMotorDireito * HBridgePWM::getValorMaximoPotencia()) / max_val;
     }
-
-    else {
-        velocidadeMotorDireito += diferencaVelocidade;
-    }
-
-    if (velocidadeMotorDireito < 0) {
-        velocidadeMotorDireito -= diferencaVelocidade;
-    }
-
-    else {
-        velocidadeMotorEsquerdo += diferencaVelocidade;
-    }
-
-    velocidadeMotorEsquerdo = std::clamp(velocidadeMotorEsquerdo, motorEsquerdo.getValorMinimoPotencia(), motorEsquerdo.getValorMaximoPotencia());
-    velocidadeMotorDireito  = std::clamp(velocidadeMotorDireito, motorDireito.getValorMinimoPotencia(), motorDireito.getValorMaximoPotencia());
 
     motorEsquerdo.setPotencia(static_cast<int32_t>(percentualVelocidade * velocidadeMotorEsquerdo));
     motorDireito.setPotencia(static_cast<int32_t>(percentualVelocidade * velocidadeMotorDireito));

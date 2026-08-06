@@ -12,6 +12,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "esp_log.h"
 
 struct Estados {
     bool roboArmado = false;
@@ -24,13 +25,21 @@ struct Estados {
     bool modoAgressivo = false;     // Select - Muda a porcentagem que multiplica a potencia enviada para o motor pelo analógico
     bool zigZagAntiHorario = false; // X + R1
     bool zigZagHorario = false;     // X + L1
+
+    bool inverterMotorDireito = false;
+    bool inverterMotorEsquerdo = false;
 };
 
-namespace Botão {
+namespace Botao {
     constexpr uint16_t CROSS     = BUTTON_A;
     constexpr uint16_t BOLA      = BUTTON_B;
     constexpr uint16_t QUADRADO  = BUTTON_X;
     constexpr uint16_t TRIANGULO = BUTTON_Y;
+
+    constexpr uint16_t CIMA     = DPAD_UP;
+    constexpr uint16_t BAIXO    = DPAD_DOWN;
+    constexpr uint16_t DIREITA  = DPAD_RIGHT;
+    constexpr uint16_t ESQUERDA = DPAD_LEFT;
 
     constexpr uint16_t L1 = BUTTON_SHOULDER_L;
     constexpr uint16_t R1 = BUTTON_SHOULDER_R;
@@ -46,7 +55,7 @@ class Controle {
         inline static SemaphoreHandle_t mutexControle = nullptr; // Mutex para proteger o acesso aos estados do controle
 
     public:
-        static constexpr uint8_t DEADZONE = 16; // Valor da zona morta para os eixos analógicos
+        static constexpr uint8_t DEADZONE = 50; // Valor da zona morta para os eixos analógicos
 
         static void init() {
             if (mutexControle == nullptr) {
@@ -68,20 +77,25 @@ class Controle {
             analogicoDireitoEixoY  = static_cast<int32_t>((analogicoDireitoEixoY * 1000) / 512);
             analogicoEsquerdoEixoX = static_cast<int32_t>((analogicoEsquerdoEixoX * 1000) / 512);
 
-            bool crossApertado = (gamepad->buttons & Botão::CROSS) != 0;
-            bool bolaApertado = (gamepad->buttons & Botão::BOLA) != 0;
-            // bool quadradoApertado = (gamepad->buttons & Botão::QUADRADO) != 0;
-            bool trianguloApertado = (gamepad->buttons & Botão::TRIANGULO) != 0;
+            bool crossApertado = (gamepad->buttons & Botao::CROSS) != 0;
+            bool bolaApertado = (gamepad->buttons & Botao::BOLA) != 0;
+            // bool quadradoApertado = (gamepad->buttons & Botao::QUADRADO) != 0;
+            bool trianguloApertado = (gamepad->buttons & Botao::TRIANGULO) != 0;
 
-            bool selectApertado = (gamepad->misc_buttons & Botão::SELECT) != 0;
-            bool psApertado = (gamepad->misc_buttons & Botão::PS_) != 0;
+            bool cimaApertado = (gamepad->buttons & Botao::CIMA) != 0;
+            // bool baixoApertado = (gamepad->buttons & Botao::BAIXO) != 0;
+            bool direitaApertado = (gamepad->buttons & Botao::DIREITA) != 0;
+            bool esquerdaApertado = (gamepad->buttons & Botao::ESQUERDA) != 0;
 
-            bool l1Apertado = (gamepad->buttons & Botão::L1) != 0;
-            bool r1Apertado = (gamepad->buttons & Botão::R1) != 0;
+            bool selectApertado = (gamepad->misc_buttons & Botao::SELECT) != 0;
+            bool psApertado = (gamepad->misc_buttons & Botao::PS_) != 0;
+
+            bool l1Apertado = (gamepad->buttons & Botao::L1) != 0;
+            bool r1Apertado = (gamepad->buttons & Botao::R1) != 0;
 
             int32_t gatilhoR2 = gamepad->throttle; // valor de 0 a 1023
             gatilhoR2 = static_cast<int32_t>((gatilhoR2 * 1000) / 1023);
-            if (std::abs(gatilhoR2) < DEADZONE) gatilhoR2 = 0;
+            if (std::abs(gatilhoR2) < 120) gatilhoR2 = 0;
 
             if (xSemaphoreTake(mutexControle, 0) == pdTRUE) { // tenta pegar o mutex sem bloquear
                 if (psApertado && bolaApertado) {
@@ -100,6 +114,9 @@ class Controle {
                 estadosControle.modoAgressivo = selectApertado;
                 estadosControle.zigZagAntiHorario = (crossApertado && r1Apertado);
                 estadosControle.zigZagHorario     = (crossApertado && l1Apertado);
+
+                estadosControle.inverterMotorDireito = (psApertado && direitaApertado);
+                estadosControle.inverterMotorEsquerdo = (psApertado && esquerdaApertado);
 
                 xSemaphoreGive(mutexControle); // libera o mutex
             }
