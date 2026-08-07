@@ -157,8 +157,13 @@ class HBridgePWM {
             }
 
             else {
-                mcpwm_comparator_set_compare_value(this->cmprIN1, VALOR_MAX_POTENCIA);
-                mcpwm_comparator_set_compare_value(this->cmprIN2, VALOR_MAX_POTENCIA);
+                #ifdef CHIHIRO
+                    mcpwm_comparator_set_compare_value(this->cmprIN1, VALOR_MAX_POTENCIA);
+                    mcpwm_comparator_set_compare_value(this->cmprIN2, VALOR_MAX_POTENCIA);
+                #elifdef HOCKEY
+                    mcpwm_comparator_set_compare_value(this->cmprIN1, 0);
+                    mcpwm_comparator_set_compare_value(this->cmprIN2, 0);
+                #endif
             }
 
             this->potencia = p;
