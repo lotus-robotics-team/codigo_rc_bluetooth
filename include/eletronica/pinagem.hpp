@@ -10,10 +10,10 @@
 namespace Pino {
     #ifdef CHIHIRO
 
-        constexpr int MOTOR_DIREITO_IN1  = 22;
-        constexpr int MOTOR_DIREITO_IN2  = 23;
-        constexpr int MOTOR_ESQUERDO_IN1 = 18;
-        constexpr int MOTOR_ESQUERDO_IN2 = 19;
+        constexpr int MOTOR_DIREITO_IN1  = 23;
+        constexpr int MOTOR_DIREITO_IN2  = 22;
+        constexpr int MOTOR_ESQUERDO_IN1 = 19;
+        constexpr int MOTOR_ESQUERDO_IN2 = 18;
 
         constexpr int SERVO = 25;
 

@@ -5,8 +5,8 @@
 #include <cstdint>
 
 namespace Parametros {
-    constexpr float velocidadePadrao = 0.65f;
-    constexpr float velocidadeAgressiva = 0.8f;
+    constexpr float velocidadePadrao = 0.38f;
+    constexpr float velocidadeAgressiva = 0.45f;
 
     float percentualVelocidade = velocidadePadrao;
 
