@@ -23,6 +23,8 @@ struct Estados {
     std::int32_t fullFrente = 0; // L2 - Vai para frente até a velocidade máxima, no analógico só vai até a velocidade padrão ou agressiva
 
     bool modoAgressivo = false;     // Select - Muda a porcentagem que multiplica a potencia enviada para o motor pelo analógico
+    bool modoToretto = false;
+
     bool zigZagAntiHorario = false; // X + R1
     bool zigZagHorario = false;     // X + L1
 
@@ -112,6 +114,8 @@ class Controle {
                 estadosControle.fullFrente = gatilhoR2;
 
                 estadosControle.modoAgressivo = selectApertado;
+                estadosControle.modoToretto   = l1Apertado;
+
                 estadosControle.zigZagAntiHorario = (crossApertado && r1Apertado);
                 estadosControle.zigZagHorario     = (crossApertado && l1Apertado);
 

@@ -12,14 +12,16 @@
 
 class Macros {
     private:
-        static bool delay(int tempo) {
-            tempo *= 1000;
-            unsigned long tempoAtual = esp_timer_get_time();
+        static bool delay(std::int64_t tempo) {
+            tempo = static_cast<std::int64_t>(tempo * 1000);
+            std::int64_t tempoAtual = esp_timer_get_time();
 
             while (esp_timer_get_time() - tempoAtual <= tempo) {
                 if ((std::abs(Controle::getVelocidadeLinear()) > 0) || (std::abs(Controle::getVelocidadeAngular()) > 0)) {
                     return true; // Interrompe o delay se houver entrada do controle
                 }
+
+                vTaskDelay(pdMS_TO_TICKS(1));
             }
 
             return false; // Delay concluído sem interrupção
@@ -37,11 +39,11 @@ class Macros {
         static void giro(bool sentidoHorario, int tempo) {
             if (sentidoHorario) {
                 motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
-                motorDireito.setPotencia(-motorDireito.getValorMinimoPotencia());
+                motorDireito.setPotencia(motorDireito.getValorMinimoPotencia());
             }
 
             else {
-                motorEsquerdo.setPotencia(-motorEsquerdo.getValorMinimoPotencia());
+                motorEsquerdo.setPotencia(motorEsquerdo.getValorMinimoPotencia());
                 motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
             }
 
@@ -63,8 +65,8 @@ class Macros {
         static void zigZagHorario() {
             giro(false, Parametros::tempoGiro45AntiHorario);
 
-            motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
-            motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
+            motorEsquerdo.setPotencia(700);
+            motorDireito.setPotencia(700);
 
             if (delay(Parametros::tempoFrenteZigZagHorario)) {
                 return;
@@ -74,10 +76,10 @@ class Macros {
 
             giro(true, Parametros::tempoGiro90Horario);
 
-            motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
-            motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
+            motorEsquerdo.setPotencia(700);
+            motorDireito.setPotencia(700);
 
-            if (delay(Parametros::tempoFrenteZigZagHorario)) {
+            if (delay(Parametros::tempoOrtogonalZigZagHorario)) {
                 return;
             }
         }
@@ -85,8 +87,8 @@ class Macros {
         static void zigZagAntiHorario() {
             giro(true, Parametros::tempoGiro45Horario);
 
-            motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
-            motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
+            motorEsquerdo.setPotencia(700);
+            motorDireito.setPotencia(700);
 
             if (delay(Parametros::tempoFrenteZigZagAntiHorario)) {
                 return;
@@ -96,10 +98,10 @@ class Macros {
 
             giro(false, Parametros::tempoGiro90AntiHorario);
 
-            motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
-            motorDireito.setPotencia(motorDireito.getValorMaximoPotencia());
+            motorEsquerdo.setPotencia(700);
+            motorDireito.setPotencia(700);
 
-            if (delay(Parametros::tempoFrenteZigZagAntiHorario)) {
+            if (delay(Parametros::tempoOrtogonalZigZagAntiHorario)) {
                 return;
             }
         }

@@ -38,6 +38,7 @@ extern "C" void app_main(void) {
    // Variáveis para debouncings
    bool estadoArmadoAnterior = false;
    bool modoAgressivoAnterior = false;
+   bool modoTorettoAnterior = false;
    bool inverterMotorDireitoAnterior = false;
    bool inverterMotorEsquerdoAnterior = false;
 
@@ -98,6 +99,18 @@ extern "C" void app_main(void) {
          if (comando.modoAgressivo && !modoAgressivoAnterior) {
             if (Parametros::percentualVelocidade == Parametros::velocidadePadrao) {
                Parametros::percentualVelocidade = Parametros::velocidadeAgressiva;
+               Controle::vibrarControle(Bluetooth::getDevice(), 150, 200);
+            }
+
+            else {
+               Parametros::percentualVelocidade = Parametros::velocidadePadrao;
+               Controle::vibrarControle(Bluetooth::getDevice(), 300, 200);
+            }
+         }
+
+         if (comando.modoToretto && !modoTorettoAnterior) {
+            if (Parametros::percentualVelocidade == Parametros::velocidadePadrao) {
+               Parametros::percentualVelocidade = Parametros::velocidadeToretto;
                Controle::vibrarControle(Bluetooth::getDevice(), 150, 200);
             }
 
