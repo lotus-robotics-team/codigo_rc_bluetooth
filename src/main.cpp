@@ -37,10 +37,7 @@ extern "C" void app_main(void) {
 
    // Variáveis para debouncings
    bool estadoArmadoAnterior = false;
-   bool modoAgressivoAnterior = false;
-   bool modoTorettoAnterior = false;
-   bool inverterMotorDireitoAnterior = false;
-   bool inverterMotorEsquerdoAnterior = false;
+   Debouncing<> debounceToretto, debounceAgressivo, debounceInverterDireito, debounceInverterEsquerdo;
 
    while (true) {
       Estados comando = Controle::getEstados();
@@ -88,15 +85,15 @@ extern "C" void app_main(void) {
             pararRobo();
          }
 
-         if (comando.inverterMotorDireito && !inverterMotorDireitoAnterior) {
+         if (debounceInverterDireito.apertado(comando.inverterMotorDireito)) {
             motorDireito.setInversao(!motorDireito.invertido);
          }
 
-         if (comando.inverterMotorEsquerdo && !inverterMotorEsquerdoAnterior) {
+         if (debounceInverterEsquerdo.apertado(comando.inverterMotorEsquerdo)) {
             motorEsquerdo.setInversao(!motorEsquerdo.invertido);
          }
 
-         if (comando.modoAgressivo && !modoAgressivoAnterior) {
+         if (debounceAgressivo.apertado(comando.modoAgressivo)) {
             if (Parametros::percentualVelocidade == Parametros::velocidadePadrao) {
                Parametros::percentualVelocidade = Parametros::velocidadeAgressiva;
                Controle::vibrarControle(Bluetooth::getDevice(), 150, 200);
@@ -108,7 +105,7 @@ extern "C" void app_main(void) {
             }
          }
 
-         if (comando.modoToretto && !modoTorettoAnterior) {
+         if (debounceToretto.apertado(comando.modoToretto)) {
             if (Parametros::percentualVelocidade == Parametros::velocidadePadrao) {
                Parametros::percentualVelocidade = Parametros::velocidadeToretto;
                Controle::vibrarControle(Bluetooth::getDevice(), 150, 200);
@@ -119,10 +116,6 @@ extern "C" void app_main(void) {
                Controle::vibrarControle(Bluetooth::getDevice(), 300, 200);
             }
          }
-
-         modoAgressivoAnterior = comando.modoAgressivo;
-         inverterMotorDireitoAnterior = comando.inverterMotorDireito;
-         inverterMotorEsquerdoAnterior = comando.inverterMotorEsquerdo;
       }
 
       else {

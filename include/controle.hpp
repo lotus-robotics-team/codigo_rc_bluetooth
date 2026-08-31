@@ -172,3 +172,17 @@ class Controle {
             }
         }
 };
+
+template <typename T = bool>
+class Debouncing {
+    private:
+        T estadoAnterior{};
+
+    public:
+        bool apertado(T estadoAtual) {
+            bool debounce = estadoAtual && !estadoAnterior;
+            estadoAnterior = estadoAtual;
+
+            return debounce;
+        }
+};
