@@ -161,4 +161,14 @@ class Controle {
                 device->report_parser.play_dual_rumble(device, 0, duracao, 0x00, forca);
             }
         }
+
+        /// @brief Função para forçar o desarme do robô em caso de desconexão
+        static void forceDesarme() {
+            if (!mutexControle) return;
+
+            if (xSemaphoreTake(mutexControle, pdMS_TO_TICKS(5)) == pdTRUE) {
+                estadosControle = Estados{};
+                xSemaphoreGive(mutexControle);
+            }
+        }
 };

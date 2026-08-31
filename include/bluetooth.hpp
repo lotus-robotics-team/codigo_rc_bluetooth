@@ -30,6 +30,10 @@ class Bluetooth {
                 hidDevice = nullptr;
             }
 
+            motorEsquerdo.freiar();
+            motorDireito.freiar();
+            Controle::forceDesarme();
+
             led.desligar(); // Desliga o LED da placa
         }
 
