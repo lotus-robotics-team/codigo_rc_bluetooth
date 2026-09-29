@@ -13,8 +13,8 @@
 class Macros {
     private:
         static bool delay(std::int64_t tempo) {
-            tempo = static_cast<std::int64_t>(tempo * 1000);
-            std::int64_t tempoAtual = esp_timer_get_time();
+            tempo *= 1000;
+            const std::int64_t tempoAtual = esp_timer_get_time();
 
             while (esp_timer_get_time() - tempoAtual <= tempo) {
                 if ((std::abs(Controle::getVelocidadeLinear()) > 0) || (std::abs(Controle::getVelocidadeAngular()) > 0)) {
