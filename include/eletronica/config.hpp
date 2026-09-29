@@ -13,27 +13,27 @@
 #include "nvs_flash.h"
 
 #if defined CHIHIRO
-    HBridgePWM motorDireito(
+    inline HBridgePWM motorDireito(
         Pino::MOTOR_DIREITO_IN1, 
         Pino::MOTOR_DIREITO_IN2
     );
-    HBridgePWM motorEsquerdo(
+    inline HBridgePWM motorEsquerdo(
         Pino::MOTOR_ESQUERDO_IN1, 
         Pino::MOTOR_ESQUERDO_IN2
     );
 
 #elif defined HOCKEY
-    HBridgePWM motorDireito(
+    inline HBridgePWM motorDireito(
         Pino::MOTOR_DIREITO_D2, 
         Pino::MOTOR_DIREITO_D3
     );
-    HBridgePWM motorEsquerdo(
+    inline HBridgePWM motorEsquerdo(
         Pino::MOTOR_ESQUERDO_D0,
         Pino::MOTOR_ESQUERDO_D1
     );
 #endif
 
-LED led(Pino::LED);
+inline LED led(Pino::LED);
 
 namespace Sistema {
     /// @brief Função para inicializar a memória flash não volátil
