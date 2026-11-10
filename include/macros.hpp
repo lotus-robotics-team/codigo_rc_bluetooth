@@ -27,6 +27,10 @@ class Macros {
             return false; // Delay concluído sem interrupção
         }
 
+        /**
+         * @brief Função para freiar os motores por um tempo determinado, normalmente usado na
+         * troca de movimentos, freiando os motores por um tempo curto para fazer a troca de direção dos motores
+         */
         static void freioDeMao() {
             motorEsquerdo.freiar();
             motorDireito.freiar();
@@ -36,6 +40,12 @@ class Macros {
             }
         }
 
+        /**
+         * @brief Macro para girar o robô no próprio eixo
+         * 
+         * @param sentidoHorario Se verdadeiro, gira no sentido horário; caso contrário, gira no sentido anti-horário
+         * @param tempo Tempo em milissegundos para o giro
+         */
         static void giro(bool sentidoHorario, int tempo) {
             if (sentidoHorario) {
                 motorEsquerdo.setPotencia(motorEsquerdo.getValorMaximoPotencia());
@@ -55,6 +65,11 @@ class Macros {
         }
 
     public:
+        /**
+         * @brief Macro para mover o robô para frente com uma velocidade específica
+         * 
+         * @param velocidade Valor da velocidade, limitado de 0 até o valor máximo
+         */
         static void fullFrente(int32_t velocidade) {
             velocidade = std::clamp(velocidade, static_cast<int32_t>(0), HBridgePWM::getValorMaximoPotencia());
 
@@ -62,6 +77,9 @@ class Macros {
             motorDireito.setPotencia(velocidade);
         }
 
+        /**
+         * @brief Macro para realizar um movimento em zigzag no sentido horário
+         */
         static void zigZagHorario() {
             giro(false, Parametros::tempoGiro45AntiHorario);
 
@@ -84,6 +102,9 @@ class Macros {
             }
         }
 
+        /**
+         * @brief Macro para realizar um movimento em zigzag no sentido anti-horário
+         */
         static void zigZagAntiHorario() {
             giro(true, Parametros::tempoGiro45Horario);
 
