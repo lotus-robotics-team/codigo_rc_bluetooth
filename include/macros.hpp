@@ -10,6 +10,9 @@
 
 #include <esp_timer.h>
 
+/**
+ * @brief Classe estática que contém macros pré-programadas para realizar movimentos específicos no robô
+ */
 class Macros {
     private:
         static bool delay(std::int64_t tempo) {
